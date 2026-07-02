@@ -91,11 +91,6 @@ const LocationDetails = () => {
             guestPhone: ''
         };
 
-        console.log('Reservation data to send:', reservationData);
-        console.log('Token:', token);
-        console.log('Username:', username);
-        console.log('Email:', userEmail);
-
         const result = await createReservation(reservationData);
         
         setIsReserving(false);
@@ -141,6 +136,59 @@ const LocationDetails = () => {
                     <p className='text-gray-600 mt-1'>
                         {listing.guests} guests · {listing.bedrooms} bedrooms · {listing.bathrooms} bathrooms
                     </p>
+                    
+                    {/* Enhanced Cleaning & Self Check-in */}
+                    <div className='flex gap-6 mt-3'>
+                        {listing.enhancedCleaning && (
+                            <div className='flex items-center gap-2'>
+                                <span>🧹</span>
+                                <p className='text-sm text-gray-600'>Enhanced cleaning</p>
+                            </div>
+                        )}
+                        {listing.selfCheckIn && (
+                            <div className='flex items-center gap-2'>
+                                <span>🔑</span>
+                                <p className='text-sm text-gray-600'>Self check-in</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <hr className='my-6' />
+
+                    {/* Host Details */}
+                    <div className='flex items-center gap-4'>
+                        <div className='w-14 h-14 bg-gray-300 rounded-full flex items-center justify-center text-xl overflow-hidden flex-shrink-0'>
+                            {listing.hostDetails?.avatar ? (
+                                <img src={listing.hostDetails.avatar} className='w-14 h-14 rounded-full object-cover' alt="Host" />
+                            ) : '👤'}
+                        </div>
+                        <div>
+                            <h3 className='font-semibold text-lg'>
+                                Hosted by {listing.hostDetails?.name || listing.host || 'Host'}
+                            </h3>
+                            {listing.hostDetails?.isSuperhost && (
+                                <span className='text-xs bg-gray-900 text-white px-2 py-0.5 rounded'>Superhost</span>
+                            )}
+                            {listing.hostDetails?.joinedDate && (
+                                <p className='text-sm text-gray-500 mt-1'>Joined {listing.hostDetails.joinedDate}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Host Stats */}
+                    {listing.hostDetails && (
+                        <div className='grid grid-cols-2 gap-4 mt-4 ml-18'>
+                            <div>
+                                <p className='font-medium'>{listing.hostDetails.responseRate || '100%'}</p>
+                                <p className='text-sm text-gray-500'>Response rate</p>
+                            </div>
+                            <div>
+                                <p className='font-medium'>{listing.hostDetails.responseTime || 'within an hour'}</p>
+                                <p className='text-sm text-gray-500'>Response time</p>
+                            </div>
+                        </div>
+                    )}
+
                     <hr className='my-6' />
 
                     <div>
@@ -150,6 +198,24 @@ const LocationDetails = () => {
 
                     <hr className='my-6' />
 
+                    {/* Sleeping Arrangements */}
+                    {listing.sleepingArrangements && listing.sleepingArrangements.length > 0 && (
+                        <>
+                            <div>
+                                <h3 className='font-semibold mb-3'>Where you'll sleep</h3>
+                                <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+                                    {listing.sleepingArrangements.map((sleep, index) => (
+                                        <div key={index} className='border rounded-lg p-4'>
+                                            <p className='font-medium'>{sleep.room}</p>
+                                            <p className='text-sm text-gray-500'>{sleep.beds}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <hr className='my-6' />
+                        </>
+                    )}
+
                     <div>
                         <h3 className='font-semibold mb-3'>What this place offers</h3>
                         <div className='grid grid-cols-2 gap-3'>
@@ -157,6 +223,77 @@ const LocationDetails = () => {
                                 <p key={index} className='text-gray-600 capitalize'>✓ {amenity}</p>
                             ))}
                         </div>
+                    </div>
+
+                    {/* Reviews Section */}
+                    {listing.reviewsList && listing.reviewsList.length > 0 && (
+                        <>
+                            <hr className='my-6' />
+                            <div>
+                                <h3 className='font-semibold mb-1'>
+                                    ★ {listing.rating} · {listing.reviews} reviews
+                                </h3>
+                                
+                                {/* Specific Ratings */}
+                                {listing.specificRatings && (
+                                    <div className='space-y-3 my-4'>
+                                        {[
+                                            { label: 'Cleanliness', value: listing.specificRatings.cleanliness || 0 },
+                                            { label: 'Communication', value: listing.specificRatings.communication || 0 },
+                                            { label: 'Check-in', value: listing.specificRatings.checkIn || 0 },
+                                            { label: 'Accuracy', value: listing.specificRatings.accuracy || 0 },
+                                            { label: 'Location', value: listing.specificRatings.location || 0 },
+                                            { label: 'Value', value: listing.specificRatings.value || 0 }
+                                        ].map((rating) => (
+                                            <div key={rating.label} className='flex items-center justify-between'>
+                                                <span className='text-sm text-gray-600 w-28'>{rating.label}</span>
+                                                <div className='flex items-center gap-2 flex-1'>
+                                                    <div className='h-1 bg-gray-200 rounded-full flex-1'>
+                                                        <div 
+                                                            className='h-1 bg-gray-900 rounded-full'
+                                                            style={{ width: `${Math.max((rating.value / 5) * 100, 5)}%` }}
+                                                        ></div>
+                                                    </div>
+                                                    <span className='text-sm font-medium w-6 text-right'>{rating.value.toFixed(1)}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Review List */}
+                                <div className='space-y-6 mt-6'>
+                                    {listing.reviewsList.slice(0, 6).map((review, index) => (
+                                        <div key={index} className='flex gap-3'>
+                                            <div className='w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-sm flex-shrink-0 overflow-hidden'>
+                                                {review.avatar ? (
+                                                    <img src={review.avatar} className='w-10 h-10 rounded-full object-cover' alt="" />
+                                                ) : '👤'}
+                                            </div>
+                                            <div>
+                                                <p className='font-medium text-sm'>{review.user}</p>
+                                                <p className='text-xs text-gray-500'>{review.date}</p>
+                                                <p className='text-sm mt-1 text-gray-700'>{review.comment}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* 7 Nights Section */}
+                    <hr className='my-6' />
+                    <div>
+                        <h3 className='font-semibold mb-2'>7 nights in {listing.locationDetails?.city || listing.location}</h3>
+                        <p className='text-sm text-gray-600'>
+                            Starting from {currency}{listing.price * 7} for a week-long stay
+                        </p>
+                        {listing.weeklyDiscount > 0 && (
+                            <p className='text-sm text-green-600 mt-1'>
+                                Save {listing.weeklyDiscount}% with weekly stays
+                            </p>
+                        )}
                     </div>
 
                     <hr className='my-6' />

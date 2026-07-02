@@ -4,12 +4,12 @@ const accommodationSchema = new mongoose.Schema({
     title: { type: String, required: true },
     location: { type: String, required: true },
     locationDetails: {
-    city: { type: String, default: '' },  
-    province: { type: String, default: '' },
-    country: { type: String, default: '' },
-    coordinates: {
-        lat: { type: Number, default: 0 },
-        lng: { type: Number, default: 0 }
+        city: { type: String, default: '' },  
+        province: { type: String, default: '' },
+        country: { type: String, default: '' },
+        coordinates: {
+            lat: { type: Number, default: 0 },
+            lng: { type: Number, default: 0 }
         }
     },
     description: { type: String, required: true },
@@ -30,6 +30,36 @@ const accommodationSchema = new mongoose.Schema({
     reviews: { type: Number, default: 0 },
     isGuestFavorite: { type: Boolean, default: false },
     date: { type: Number, required: true },
+    
+    specificRatings: {
+        cleanliness: { type: Number, default: 0 },
+        communication: { type: Number, default: 0 },
+        checkIn: { type: Number, default: 0 },
+        accuracy: { type: Number, default: 0 },
+        location: { type: Number, default: 0 },
+        value: { type: Number, default: 0 }
+    },
+    enhancedCleaning: { type: Boolean, default: false },
+    selfCheckIn: { type: Boolean, default: false },
+    hostDetails: {
+        name: { type: String, default: '' },
+        avatar: { type: String, default: '' },
+        responseRate: { type: String, default: '100%' },
+        responseTime: { type: String, default: 'within an hour' },
+        isSuperhost: { type: Boolean, default: false },
+        joinedDate: { type: String, default: '' }
+    },
+    sleepingArrangements: [{
+        room: { type: String },
+        beds: { type: String }
+    }],
+    reviewsList: [{
+        user: { type: String },
+        avatar: { type: String, default: '' },
+        rating: { type: Number },
+        date: { type: String },
+        comment: { type: String }
+    }]
 });
 
 // geospatial index for location queries

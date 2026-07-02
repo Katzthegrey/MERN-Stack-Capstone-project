@@ -297,6 +297,67 @@ const completeReservation = async (req, res) => {
 };
 
 /**
+ * Rate a completed reservation.
+ * PATCH /api/reservations/:id/rate
+ */
+const rateReservation = async (req, res) => {
+    try {
+        const { rating, review } = req.body;
+        const reservation = await Reservation.findById(req.params.id);
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: "Reservation not found"
+            });
+        }
+
+        if (reservation.guestId.toString() !== req.userId) {
+            return res.status(403).json({
+                success: false,
+                message: "Not authorized"
+            });
+        }
+
+        if (reservation.status !== 'completed') {
+            return res.status(400).json({
+                success: false,
+                message: "Can only rate completed reservations"
+            });
+        }
+
+        reservation.rating = rating;
+        reservation.review = review || '';
+        reservation.ratedAt = new Date();
+        await reservation.save();
+
+        // Also update the accommodation's rating
+        const Accommodation = (await import('../models/Accommodation.js')).default;
+        const accommodation = await Accommodation.findById(reservation.listingId);
+        if (accommodation) {
+            const allReservations = await Reservation.find({ 
+                listingId: reservation.listingId, 
+                status: 'completed',
+                rating: { $gt: 0 }
+            });
+            const avgRating = allReservations.reduce((sum, r) => sum + r.rating, 0) / allReservations.length;
+            accommodation.rating = Math.round(avgRating * 10) / 10;
+            accommodation.reviews = allReservations.length;
+            await accommodation.save();
+        }
+
+        res.json({
+            success: true,
+            message: "Rating submitted successfully",
+            reservation
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+/**
  * Cancel a reservation.
  * PATCH /api/reservations/:id/cancel
  */
@@ -383,6 +444,7 @@ export {
     updateReservationStatus,
     deleteReservation,
     completeReservation,
+    rateReservation,
     cancelReservation,
     getAllReservations
 };

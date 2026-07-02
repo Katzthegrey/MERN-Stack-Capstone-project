@@ -8,7 +8,8 @@ import {
     deleteReservation,
     completeReservation,
     cancelReservation,
-    getAllReservations
+    getAllReservations,
+    rateReservation       
 } from '../controllers/reservationController.js';
 import auth from '../middleware/auth.js';
 
@@ -23,5 +24,6 @@ reservationRouter.patch('/:id/status', auth, updateReservationStatus);
 reservationRouter.patch('/:id/complete', auth, completeReservation);
 reservationRouter.patch('/:id/cancel', auth, cancelReservation);
 reservationRouter.delete('/:id', auth, deleteReservation);
+reservationRouter.patch('/:id/rate', auth, rateReservation);
 
 export default reservationRouter;
