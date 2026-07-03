@@ -28,7 +28,7 @@ const Navbar = () => {
     
     const isDark = theme === 'dark';
 
-    // ✅ Admin panel URL
+    // Admin panel URL
     const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:5174';
 
     // Refs for click-outside detection
@@ -42,7 +42,15 @@ const Navbar = () => {
     const guestsRef = useRef(null);
     const searchBarRef = useRef(null);
 
-    const PROVINCES = ['Johannesburg', 'Pretoria', 'North-West', 'Limpopo', 'KwaZulu-Natal', 'Eastern Cape', 'Western Cape', 'Gauteng', 'Mpumalanga', 'Free State'];
+    const PROVINCES = ['Gauteng', 'Western Cape', 'KwaZulu-Natal', 'Eastern Cape', 'Mpumalanga', 'Limpopo', 'North-West', 'Free State', 'Northern Cape'];
+
+    // Get first letter of username for avatar
+    const getInitial = () => {
+        if (username) {
+            return username.charAt(0).toUpperCase();
+        }
+        return null;
+    };
 
     // Get today's date for min attribute
     const getToday = () => {
@@ -155,17 +163,17 @@ const Navbar = () => {
     }, [visible]);
 
     return (
-        <div className={`flex flex-col py-5 font-medium border-b transition-colors duration-300 ${
+        <div className={`fixed top-0 left-0 right-0 z-50 flex flex-col py-3 font-medium border-b transition-colors duration-300 ${
             isDark ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
         }`}>
             <div className='flex items-center justify-between px-4'>
                 {/* Logo */}
                 <Link to={'/'}>
-                    <img src={assets.logo} className='w-32' alt="Airbnb" />
+                    <img src={assets.logo} className='w-28 md:w-32' alt="Airbnb" />
                 </Link>
 
                 {/* Navigation Links */}
-                <div className='hidden md:flex items-center gap-8'>
+                <div className='hidden md:flex items-center gap-6'>
                     <Link 
                         to={'/'} 
                         onClick={() => setActiveTab('places')}
@@ -194,29 +202,15 @@ const Navbar = () => {
                             <span className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF385C] rounded-full'></span>
                         )}
                     </Link>
-                    <Link 
-                        to={'/online-experiences'} 
-                        onClick={() => setActiveTab('online')}
-                        className={`relative text-sm font-medium pb-1 transition ${
-                            activeTab === 'online' 
-                                ? isDark ? 'text-white' : 'text-gray-900'
-                                : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                    >
-                        Online experiences
-                        {activeTab === 'online' && (
-                            <span className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF385C] rounded-full'></span>
-                        )}
-                    </Link>
                 </div>
 
                 {/* Right section */}
-                <div className='flex items-center gap-4'>
+                <div className='flex items-center gap-3'>
                     <a 
                         href={`${ADMIN_URL}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`hidden sm:block text-sm px-4 py-2 rounded-full transition ${
+                        className={`hidden sm:block text-sm px-3 py-1.5 rounded-full transition ${
                             isDark ? 'hover:bg-gray-800 text-gray-200' : 'hover:bg-gray-100'
                         }`}
                     >
@@ -227,14 +221,14 @@ const Navbar = () => {
                     <div className='relative' ref={hamburgerRef}>
                         <button
                             onClick={() => setHamburgerDropdownOpen(!hamburgerDropdownOpen)}
-                            className={`flex items-center justify-center w-10 h-10 rounded-full border transition ${
+                            className={`flex items-center justify-center w-9 h-9 rounded-full border transition ${
                                 isDark 
                                     ? 'border-gray-600 hover:bg-gray-800' 
                                     : 'border-gray-300 hover:bg-gray-100'
                             }`}
                             aria-label="Menu"
                         >
-                            <i className={`fas fa-bars ${isDark ? 'text-white' : 'text-gray-700'}`}></i>
+                            <i className={`fas fa-bars text-sm ${isDark ? 'text-white' : 'text-gray-700'}`}></i>
                         </button>
 
                         {hamburgerDropdownOpen && (
@@ -279,11 +273,22 @@ const Navbar = () => {
                     <div className='relative' ref={dropdownRef}>
                         <button
                             onClick={() => token ? setDropdownOpen(!dropdownOpen) : navigate('/login')}
-                            className={`flex items-center gap-2 border rounded-full px-3 py-2 hover:shadow-md transition ${
+                            className={`flex items-center gap-2 border rounded-full px-2 py-1.5 hover:shadow-md transition ${
                                 isDark ? 'border-gray-600 hover:bg-gray-800' : 'border-gray-300'
                             }`}
                         >
-                            <img className='w-5 cursor-pointer' src={assets.profile_icon} alt="Profile" />
+                            <i className={`fas fa-bars text-xs ${isDark ? 'text-white' : 'text-gray-700'}`}></i>
+                            
+                            {/* User Avatar - shows initial when logged in, icon when not */}
+                            {token && username ? (
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold ${
+                                    isDark ? 'bg-gray-600 text-white' : 'bg-gray-800 text-white'
+                                }`}>
+                                    {getInitial()}
+                                </div>
+                            ) : (
+                                <img className='w-7 h-7' src={assets.profile_icon} alt="Profile" />
+                            )}
                         </button>
 
                         {token && dropdownOpen && (
@@ -312,7 +317,7 @@ const Navbar = () => {
             </div>
 
             {/* SEARCH FILTER BAR */}
-            <div className='flex items-center justify-center mt-4' ref={searchBarRef}>
+            <div className='flex items-center justify-center mt-2' ref={searchBarRef}>
                 <div className={`flex items-center border rounded-full shadow-sm hover:shadow-md transition ${
                     isDark ? 'border-gray-600' : 'border-gray-300'
                 }`}>
@@ -326,7 +331,7 @@ const Navbar = () => {
                                 setCheckOutDropdownOpen(false);
                                 setGuestsDropdownOpen(false);
                             }}
-                            className={`flex flex-col items-start px-6 py-3 rounded-l-full min-w-[140px] transition ${
+                            className={`flex flex-col items-start px-4 py-2 rounded-l-full min-w-[120px] transition ${
                                 isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                             }`}
                         >
@@ -360,7 +365,7 @@ const Navbar = () => {
                                                     : (isDark ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50')
                                             }`}
                                         >
-                                             {province}
+                                            📍 {province}
                                         </button>
                                     ))}
                                 </div>
@@ -368,10 +373,9 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* Divider */}
-                    <div className={`w-px h-8 ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+                    <div className={`w-px h-6 ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
 
-                    {/* Check-in Date Picker */}
+                    {/* Check-in */}
                     <div className='relative' ref={checkInRef}>
                         <button
                             onClick={() => {
@@ -380,7 +384,7 @@ const Navbar = () => {
                                 setCheckOutDropdownOpen(false);
                                 setGuestsDropdownOpen(false);
                             }}
-                            className={`flex flex-col items-start px-6 py-3 min-w-[130px] transition ${
+                            className={`flex flex-col items-start px-4 py-2 min-w-[110px] transition ${
                                 isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                             }`}
                         >
@@ -391,12 +395,9 @@ const Navbar = () => {
                         </button>
                         
                         {checkInDropdownOpen && (
-                            <div className={`absolute top-full left-0 mt-2 border rounded-lg shadow-lg z-20 p-4 ${
+                            <div className={`absolute top-full left-0 mt-2 border rounded-lg shadow-lg z-20 p-3 ${
                                 isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                             }`}>
-                                <label className={`block text-xs font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    Select check-in date
-                                </label>
                                 <input
                                     type="date"
                                     value={checkIn}
@@ -416,10 +417,9 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* Divider */}
-                    <div className={`w-px h-8 ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+                    <div className={`w-px h-6 ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
 
-                    {/* Check-out Date Picker */}
+                    {/* Check-out */}
                     <div className='relative' ref={checkOutRef}>
                         <button
                             onClick={() => {
@@ -428,7 +428,7 @@ const Navbar = () => {
                                 setCheckInDropdownOpen(false);
                                 setGuestsDropdownOpen(false);
                             }}
-                            className={`flex flex-col items-start px-6 py-3 min-w-[130px] transition ${
+                            className={`flex flex-col items-start px-4 py-2 min-w-[110px] transition ${
                                 isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                             }`}
                         >
@@ -439,12 +439,9 @@ const Navbar = () => {
                         </button>
                         
                         {checkOutDropdownOpen && (
-                            <div className={`absolute top-full left-0 mt-2 border rounded-lg shadow-lg z-20 p-4 ${
+                            <div className={`absolute top-full left-0 mt-2 border rounded-lg shadow-lg z-20 p-3 ${
                                 isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                             }`}>
-                                <label className={`block text-xs font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    Select check-out date
-                                </label>
                                 <input
                                     type="date"
                                     value={checkOut}
@@ -462,10 +459,9 @@ const Navbar = () => {
                         )}
                     </div>
 
-                   
-                    <div className={`w-px h-8 ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+                    <div className={`w-px h-6 ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
 
-                    {/* Guests Dropdown + Search Button */}
+                    {/* Guests + Search */}
                     <div className='relative flex items-center' ref={guestsRef}>
                         <button
                             onClick={() => {
@@ -474,7 +470,7 @@ const Navbar = () => {
                                 setCheckInDropdownOpen(false);
                                 setCheckOutDropdownOpen(false);
                             }}
-                            className={`flex flex-col items-start px-6 py-3 min-w-[120px] transition ${
+                            className={`flex flex-col items-start px-4 py-2 min-w-[100px] transition ${
                                 isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                             }`}
                         >
@@ -484,31 +480,26 @@ const Navbar = () => {
                             </span>
                         </button>
                         
-                        {/* Search Icon Button */}
                         <button
                             onClick={handleSearch}
                             disabled={!isSearchReady}
-                            className={`p-2.5 rounded-full mr-1.5 transition ${
+                            className={`p-2 rounded-full mr-1 transition ${
                                 isSearchReady 
                                     ? 'bg-[#FF385C] text-white hover:bg-[#e0314f]' 
                                     : (isDark ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gray-100 text-gray-400 cursor-not-allowed')
                             }`}
-                            title={isSearchReady ? 'Search' : 'Fill all fields to search'}
                         >
                             <i className="fas fa-search text-sm"></i>
                         </button>
                         
                         {guestsDropdownOpen && (
-                            <div className={`absolute top-full right-0 mt-2 border rounded-lg shadow-lg z-20 p-4 w-64 ${
+                            <div className={`absolute top-full right-0 mt-2 border rounded-lg shadow-lg z-20 p-3 w-56 ${
                                 isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                             }`}>
-                                <label className={`block text-xs font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    Number of guests
-                                </label>
                                 <div className='flex items-center justify-between'>
                                     <button
                                         onClick={() => setGuests(Math.max(1, guests - 1))}
-                                        className={`w-10 h-10 rounded-full border flex items-center justify-center text-lg transition ${
+                                        className={`w-8 h-8 rounded-full border flex items-center justify-center text-lg transition ${
                                             isDark ? 'border-gray-600 hover:bg-gray-700 text-white' : 'border-gray-300 hover:bg-gray-50'
                                         }`}
                                     >
@@ -519,19 +510,16 @@ const Navbar = () => {
                                     </span>
                                     <button
                                         onClick={() => setGuests(Math.min(16, guests + 1))}
-                                        className={`w-10 h-10 rounded-full border flex items-center justify-center text-lg transition ${
+                                        className={`w-8 h-8 rounded-full border flex items-center justify-center text-lg transition ${
                                             isDark ? 'border-gray-600 hover:bg-gray-700 text-white' : 'border-gray-300 hover:bg-gray-50'
                                         }`}
                                     >
                                         +
                                     </button>
                                 </div>
-                                <p className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    {guests} guest{guests > 1 ? 's' : ''}
-                                </p>
                                 <button
                                     onClick={() => setGuestsDropdownOpen(false)}
-                                    className={`w-full mt-3 py-2 rounded-lg text-sm font-medium transition ${
+                                    className={`w-full mt-3 py-1.5 rounded-lg text-sm font-medium transition ${
                                         isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                                 >
@@ -543,14 +531,13 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Mobile Menu d */}
+            {/* Mobile Menu */}
             <div 
                 ref={mobileMenuRef}
                 className={`fixed top-0 right-0 h-full w-full max-w-sm overflow-hidden transition-transform duration-300 z-40 ${
                     visible ? 'translate-x-0' : 'translate-x-full'
                 } ${isDark ? 'bg-gray-900 text-gray-200' : 'bg-white text-gray-600'}`}
             >
-                
                 <div className='flex flex-col h-full overflow-y-auto'>
                     <div onClick={() => setVisible(false)} className='flex items-center gap-4 p-4 cursor-pointer border-b'>
                         <i className={`fas fa-arrow-left ${isDark ? 'text-gray-400' : 'text-gray-600'}`}></i>
