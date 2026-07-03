@@ -23,7 +23,8 @@ connectCloudinary();
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
-    'https://mern-stack-capstone-project-frntend.onrender.com/',
+    'https://mern-stack-capstone-project-frntend.onrender.com',
+    'https://mern-stack-capstone-project-admin.onrender.com',
 ];
 
 app.use(cors({
